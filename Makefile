@@ -97,7 +97,11 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ | sed -e s/ppc/powerpc/ | sed 
 
 ARCH ?= $(SUBARCH)
 CROSS_COMPILE ?=
+ifneq ($(CUSTOM_KERNEL_VERSION),)
+KVER := $(CUSTOM_KERNEL_VERSION)
+else
 KVER  := $(shell uname -r)
+endif
 KSRC ?= /lib/modules/$(KVER)/build
 MODDESTDIR := /lib/modules/$(KVER)/kernel/drivers/net/wireless
 INSTALL_PREFIX :=
@@ -150,6 +154,7 @@ strip:
 	$(CROSS_COMPILE)strip 8188eu.ko --strip-unneeded
 
 install:
+	mkdir -p $(MODDESTDIR)
 	install -p -m 644 8188eu.ko  $(MODDESTDIR)
 	@if [ -a /lib/modules/$(KVER)/kernel/drivers/staging/rtl8188eu/r8188eu.ko ] ; then modprobe -r r8188eu; fi;
 	@echo "blacklist r8188eu" > /etc/modprobe.d/50-8188eu.conf
